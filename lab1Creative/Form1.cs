@@ -36,13 +36,13 @@ namespace lab1Creative
         int ayOld = 127;
         int azOld = 127;
 
-        // average of the Ax, Ay, Az queue
-        double axAvg = 127;
-        double ayAvg = 127;
-        double azAvg = 127;
+        // store the user input Ax, Ay, Az value
+        double axInput = 127;
+        double ayInput = 127;
+        double azInput = 127;
 
         // number of data points to record
-        Int32 numDataPts = 2;
+        Int32 numDataPts = 1;
 
         // to display Serial Bytes to Read
         int serialBytesToRead = 0;
@@ -81,6 +81,9 @@ namespace lab1Creative
                 comboBox1.SelectedIndex = 0;
 
             timer1.Start();
+
+            // hide target picturebox
+            target.Hide();
 
         }
 
@@ -128,13 +131,16 @@ namespace lab1Creative
                         az.Enqueue(dequeuedItem);
                         nextIsAz = false;
 
-                            // update state variable
-                            state_machine_control();
-                            textBoxState.Text = state.ToString();
+                        // update state variable
+                        state_machine_control();
+                        textBoxState.Text = state.ToString();
 
-                            // update other variable according to the current state
-                            state_machine_update();
-                            //textBoxGesture.Text = gesture.ToString();
+                        textBoxAx.Text = axInput.ToString();
+                        textBoxAy.Text = ayInput.ToString();
+
+                        // update other variable according to the current state
+                        state_machine_update();
+                        //textBoxGesture.Text = gesture.ToString();
                     }
                 }
             }
@@ -147,14 +153,11 @@ namespace lab1Creative
             int recordThresh = numDataPts*4; // cycles to wait when recording //4 * numDataPts
             if (state == 1)
             {
-                if (count >= recordThresh)
-                {
-                    state = 2;
-                }
+                state = 2; // TODO: remove this useless state
             }
             else if (state == 2)
             {
-                if (ball.Location.Y > 0) // lose
+                if (ball.Location.Y < 0) // lose
                 {
                     state = 4;
                 }
@@ -173,7 +176,7 @@ namespace lab1Creative
             }
             else // state == 0
             {
-                if (axVal > accelThresh)
+                if (ayInput > accelThresh)
                 {
                     state = 1;
                 }
@@ -183,8 +186,10 @@ namespace lab1Creative
         void state_machine_update()
         {
 
-            Point newLocation = new Point(Width / 2, Height / 2);
-            
+            //Point ballStartLocation = new Point(411, 345);
+            Point ballStartLocation = new Point(Width / 2, Height / 2);
+            //Point targetStartLocation = new Point(401, 58);
+
 
             if (state == 1) // record accelerometer data
             {
@@ -192,10 +197,26 @@ namespace lab1Creative
             }
             else if (state == 2) // move ball
             {
-                Xstep = (axVal - 127) / 127 * maxSpeed;
-                Ystep = (ayVal - 127) / 127 * maxSpeed;
+                
+                // negative due to sensor delay
+                Xstep = -1 * (axInput - 127) / 127 * maxSpeed;
+
+                // negative absoluate value to always move the ball up
+                if ((ayInput - 127) < 0)
+                {
+                    Ystep = (ayInput - 127) / 127 * maxSpeed;
+                }
+                else
+                {
+                    Ystep = -1 * (ayInput - 127) / 127 * maxSpeed;
+                }
+                    
+
                 Xvelocity = Convert.ToInt32(Xstep * speed);
                 Yvelocity = Convert.ToInt32(Ystep * speed);
+
+                Point ballMoveLocation = new Point(ball.Location.X + Xvelocity, ball.Location.Y + Yvelocity);
+                ball.Location = ballMoveLocation;
             }
             else if (state == 3)
             {
@@ -207,37 +228,17 @@ namespace lab1Creative
             }
             else // state == 0 // game start
             {
-                ball.Location = newLocation;
+                ball.Location = ballStartLocation;
+                //target.Location = targetStartLocation;
+                count = 0;
+                axInput = axVal;
+                ayInput = ayVal;
             }
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             serialPort1.PortName = comboBox1.SelectedItem.ToString();
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            // serialPort1.Open();
-
-            string nameCOMPort = "";
-            // check if connection is satisfied
-            if (comboBox1.Text != "")
-                nameCOMPort = comboBox1.Text;
-            else
-                MessageBox.Show("No COM Port Selected", "Error");
-            // open and close port
-            if (serialPort1.IsOpen)
-            {
-                serialPort1.Dispose();
-                button2.Text = "Connect";
-            }
-            else if (!serialPort1.IsOpen)
-            {
-                serialPort1.PortName = nameCOMPort;
-                serialPort1.Open();
-                button2.Text = "Disconnect";
-            }
         }
 
         private void textBoxState_TextChanged(object sender, EventArgs e)
@@ -270,6 +271,38 @@ namespace lab1Creative
                 dataQueue.Enqueue(newByte);
 
                 bytesToRead = serialPort1.BytesToRead;
+            }
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void buttonConnectSerial_Click(object sender, EventArgs e)
+        {
+            // hide Game start UI elements
+            buttonConnectSerial.Hide();
+            labelCOMPort.Hide();
+            comboBox1.Hide();
+
+            string nameCOMPort = "";
+            // check if connection is satisfied
+            if (comboBox1.Text != "")
+                nameCOMPort = comboBox1.Text;
+            else
+                MessageBox.Show("No COM Port Selected", "Error");
+            // open and close port
+            if (serialPort1.IsOpen)
+            {
+                serialPort1.Dispose();
+                buttonConnectSerial.Text = "Connect";
+            }
+            else if (!serialPort1.IsOpen)
+            {
+                serialPort1.PortName = nameCOMPort;
+                serialPort1.Open();
+                buttonConnectSerial.Text = "Disconnect";
             }
         }
     }

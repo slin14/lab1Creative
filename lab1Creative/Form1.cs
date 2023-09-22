@@ -218,7 +218,7 @@ namespace lab1Creative
             {
                 
                 // negative due to sensor delay
-                Xstep = -1 * (axInput - 127) / 127 * maxSpeed;
+                Xstep = (axInput - 127) / 127 * maxSpeed;
 
                 // negative absoluate value to always move the ball up
                 if ((ayInput - 127) < 0)

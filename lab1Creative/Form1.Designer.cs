@@ -169,7 +169,7 @@
             this.buttonConnectSerial.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.buttonConnectSerial.Name = "buttonConnectSerial";
             this.buttonConnectSerial.Size = new System.Drawing.Size(616, 283);
-            this.buttonConnectSerial.TabIndex = 28;
+            this.buttonConnectSerial.TabIndex = 0;
             this.buttonConnectSerial.Text = "Start Game";
             this.buttonConnectSerial.UseVisualStyleBackColor = false;
             this.buttonConnectSerial.Click += new System.EventHandler(this.buttonConnectSerial_Click);

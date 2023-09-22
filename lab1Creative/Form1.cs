@@ -64,6 +64,12 @@ namespace lab1Creative
         int maxSpeed = 10;
         int accelThresh = 180; // Ax value when throwing action initiated
 
+
+        Random randomizer = new Random();
+        int ballStartY = 1;
+        int randNum = 50; // store a random number between 0 and 50
+
+
         public Form1()
         {
             InitializeComponent();
@@ -85,6 +91,15 @@ namespace lab1Creative
             // hide target picturebox
             target.Hide();
 
+            // uncomment for testing
+            label1.Hide();
+            textBoxAx.Hide();
+            label2.Hide();
+            textBoxAy.Hide();
+            label9.Hide();
+            textBoxState.Hide();
+
+            
         }
 
         // DataReceived event handler for serialPort
@@ -131,6 +146,9 @@ namespace lab1Creative
                         az.Enqueue(dequeuedItem);
                         nextIsAz = false;
 
+                        // generate random number between 10 and 40
+                        randNum = randomizer.Next(10,41);
+
                         // update state variable
                         state_machine_control();
                         textBoxState.Text = state.ToString();
@@ -150,10 +168,13 @@ namespace lab1Creative
 
         void state_machine_control()
         {
-            int recordThresh = numDataPts*4; // cycles to wait when recording //4 * numDataPts
+            int recordThresh = numDataPts*4; // wait for acceleration
             if (state == 1)
             {
-                state = 2; // TODO: remove this useless state
+                if (ayInput > accelThresh)
+                {
+                    state = 2;
+                }
             }
             else if (state == 2)
             {
@@ -176,24 +197,22 @@ namespace lab1Creative
             }
             else // state == 0
             {
-                if (ayInput > accelThresh)
-                {
-                    state = 1;
-                }
+                state = 1;
             }
         }
 
         void state_machine_update()
         {
 
-            //Point ballStartLocation = new Point(411, 345);
-            Point ballStartLocation = new Point(Width / 2, Height / 2);
-            //Point targetStartLocation = new Point(401, 58);
+            //Point ballStartLocation = new Point(Width / 2, Height / 2);
 
+            // random ball start location in y
+            ballStartY = Width / 2;
 
-            if (state == 1) // record accelerometer data
+            if (state == 1) // wait for acceleration
             {
-                count++;
+                axInput = axVal;
+                ayInput = ayVal;
             }
             else if (state == 2) // move ball
             {
@@ -221,18 +240,24 @@ namespace lab1Creative
             else if (state == 3)
             {
                 MessageBox.Show("Yay you win!");
+                // generate random number for new ball location
+                randNum = randomizer.Next(10,41);
             }
             else if (state == 4)
             {
                 MessageBox.Show("you lost!");
+                // generate random number for new ball location
+                randNum = randomizer.Next(10,41);
             }
             else // state == 0 // game start
             {
+                // set a random ball location
+                ballStartY = Convert.ToInt32(1 + (Width * (randNum / 50.0)));
+                
+                Point ballStartLocation = new Point(ballStartY, Height / 2);
                 ball.Location = ballStartLocation;
                 //target.Location = targetStartLocation;
                 count = 0;
-                axInput = axVal;
-                ayInput = ayVal;
             }
         }
 

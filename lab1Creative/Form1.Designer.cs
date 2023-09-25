@@ -49,7 +49,7 @@
             // 
             // ball
             // 
-            this.ball.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.ball.BackColor = System.Drawing.Color.Transparent;
             this.ball.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("ball.BackgroundImage")));
             this.ball.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ball.Location = new System.Drawing.Point(820, 310);

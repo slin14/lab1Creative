@@ -99,7 +99,9 @@ namespace lab1Creative
             label9.Hide();
             textBoxState.Hide();
 
-            
+            // fix graphics flicker
+            DoubleBuffered = true;
+
         }
 
         // DataReceived event handler for serialPort
@@ -218,7 +220,7 @@ namespace lab1Creative
             {
                 
                 // negative due to sensor delay
-                Xstep = (axInput - 127) / 127 * maxSpeed;
+                Xstep = -1 * (axInput - 127) / 127 * maxSpeed;
 
                 // negative absoluate value to always move the ball up
                 if ((ayInput - 127) < 0)

@@ -241,12 +241,16 @@ namespace lab1Creative
             }
             else if (state == 3)
             {
-                MessageBox.Show("Yay you win!");
+                System.Media.SoundPlayer player = new System.Media.SoundPlayer(@"C:\Users\sophi\Documents\4year\MECH423\lab1Creative\win.wav");
+                player.Play();
+                MessageBox.Show("Yay you WIN!");
                 // generate random number for new ball location
                 randNum = randomizer.Next(10,41);
             }
             else if (state == 4)
             {
+                System.Media.SoundPlayer player = new System.Media.SoundPlayer(@"C:\Users\sophi\Documents\4year\MECH423\lab1Creative\lose.wav");
+                player.Play();
                 MessageBox.Show("you lost!");
                 // generate random number for new ball location
                 randNum = randomizer.Next(10,41);
